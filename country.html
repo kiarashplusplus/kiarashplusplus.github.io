@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link href="http://blocked_report.s3.amazonaws.com/d3js/style.css" rel="stylesheet" type="text/css" />
+<body>
+	<div class="container">
+		Country: 
+		<div style="width:400px">			
+			<input type="text" value="india" id="countryField"/>	<a id="btnshowdata" href="javascript:void(0);">Show</a>
+		</div>
+		<div class="chart">
+	        <div id="chartdata"><svg class="pie-b"></svg></div>	        
+	    </div>
+	</div>
+	
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
+</script>
+<script src="http://blocked_report.s3.amazonaws.com/d3js/AutoCountry.js"></script>
+<script src="http://blocked_report.s3.amazonaws.com/d3js/d3.v3.min.js"></script>
+<script src="http://blocked_report.s3.amazonaws.com/d3js/pie-chart.js"></script>
+<script src="http://fgnass.github.io/spin.js/spin.min.js"></script>
+
+<script>
+function ajaxFunc(surl)	{	
+	$("#chartdata").empty();
+	var url="assets/pie.json?country="+surl;
+	$.get(url,function(data) {		
+		if (data.st==1){			
+			$("#chartdata").html('<svg class="pie-b"></svg>');			
+			ay.pie_chart('pie-b', data.items, {radius_inner: 50});
+		}else if (data.st==0){
+			$("#chartdata").html("<h1>"+data.items+
+				"is a country. but no items found.</h1>");
+		}else{			
+			$("#chartdata").html("<h1>This is not country. Do something else with: "+
+				data.items+"</h1>");
+			//<img class='notfound' src='http://www.vvitech.com/Images/DataNotFound.jpg' alt='Not Found'>			
+		}		
+	});
+}
+
+$(document).ready(function(){
+	ajaxFunc($('#countryField').val());    
+	AC.init("countryField");//contrypicker
+
+	// Spinner for ajax
+	var target = document.getElementById('chartdata');
+	var opts = {
+			  lines: 13, // The number of lines to draw
+			  length: 20, // The length of each line
+			};
+	var spinner=new Spinner(opts).spin(target);
+	spinner.stop();
+	$(document).on({
+	    ajaxStart: function() {spinner.spin(target);},
+	    ajaxStop: function() {spinner.stop();}
+	});
+	// End of Spinner
+
+	$(document).on('click','#helper a',function(){
+		ajaxFunc($(this).text());
+	});
+	$('#btnshowdata').click(function(){
+		ajaxFunc($('#countryField').val());
+	});
+    
+});
+</script>
